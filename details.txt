@@ -1,0 +1,47 @@
+Project 2: Task Manager
+Goal
+
+Build a small task management application where you can:
+
+Add a task
+View tasks
+Edit a task
+Delete a task
+Mark a task as completed
+
+That's it.
+
+UI
+
+Something simple like:
+
+My Tasks
+
+┌──────────────────────────────┐
+│ Learn React                  │
+│ Learn React fundamentals     │
+│                              │
+│ ☐ Completed                  │
+│                              │
+│ Edit       Delete            │
+└──────────────────────────────┘
+
+┌──────────────────────────────┐
+│ Build REST API               │
+│ Create backend API           │
+│                              │
+│ ☑ Completed                  │
+│                              │
+│ Edit       Delete            │
+└──────────────────────────────┘
+
+And at the top:
+
+Add New Task
+
+Title:       [________________]
+
+Description: [________________]
+             [________________]
+
+             [ Add Task ]
