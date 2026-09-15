@@ -1,122 +1,122 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
-
+import { useEffect, useState } from "react";
+import "./App.css";
 function App() {
-  const [count, setCount] = useState(0)
+  const [tasks, setTask] = useState([]);
+
+  useEffect(() => {
+    async function getTasks() {
+      try {
+        const response = await fetch("http://localhost:3000/api/task");
+        const data = await response.json();
+
+        setTask(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getTasks();
+  }, []);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    try {
+      const formData = new FormData(event.target);
+      const request = await fetch("http://localhost:3000/api/task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.get("title"),
+          desc: formData.get("description"),
+        }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function edit(event, id) {
+    event.preventDefault();
+    try {
+      const formData = new FormData(event.target);
+      const req = await fetch(`http://localhost:3000/api/task/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.get("title"),
+          desc: formData.get("description"),
+        }),
+      });
+    } catch (error) {}
+  }
+
+  function Card({ task }) {
+    const [isEditing, setEditing] = useState(false);
+
+    if (!isEditing) {
+      return (
+        <>
+          <h3>{task.title}</h3>
+          <p>{task.description}</p>
+          <p>{task.completed ? "Completed" : "Not completed"}</p>
+          <button
+            onClick={() => {
+              setEditing(true);
+            }}
+          >
+            Edit
+          </button>
+          <button onClick={() => deleteTask(task.id)}>Delete</button>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <form onSubmit={(event) => edit(event, task.id)}>
+            <label>Title</label>
+            <input type="text" name="title" />
+            <label>Description</label>
+            <textarea name="description" />
+            <button type="submit">Save</button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(false);
+              }}
+            >
+              Cancel
+            </button>
+          </form>
+        </>
+      );
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <div className="card">
+        <h3>Add Task</h3>
+        <p>add task </p>
+        <form onSubmit={handleSubmit}>
+          <label>Title</label>
+          <input type="text" name="title" />
+          <label>Description</label>
+          <textarea name="description" />
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <button type="submit">submit</button>
+        </form>
+      </div>
+      <div>
+        {tasks.map((task) => (
+          <div key={task.id} className="card">
+            <Card task={task} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
-
-export default App
+export default App;
