@@ -36,8 +36,10 @@ app.post("/api/task", async (req, res) => {
 app.put("/api/task/:id",async (req,res)=>{
   try{
     const {id} = req.params;
-    const {title,desc} = req.body;
-    const sql = await pool.query("UPDATE tasks SET title=$1, description=$2 WHERE id=$3 ",[title,desc,id]);
+    const {title,desc,completed} = req.body;
+    const response = await pool.query("SELECT * FROM tasks WHERE id=$1",[id]);
+    const data = res.json(response.rows);
+    const sql = await pool.query("UPDATE tasks SET title=$1, description=$2,completed=$3 WHERE id=$4 ",[title,desc,completed,id]);
 
   }catch(error){}
 });

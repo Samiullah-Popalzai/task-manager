@@ -36,7 +36,7 @@ function App() {
     }
   }
 
-  async function edit(event, id) {
+  async function edit(event, id,closeEditing) {
     event.preventDefault();
     try {
       const formData = new FormData(event.target);
@@ -48,14 +48,20 @@ function App() {
         body: JSON.stringify({
           title: formData.get("title"),
           desc: formData.get("description"),
+          completed: formData.get("completed"),
         }),
       });
+
+      const res = await req.json();
+      closeEditing();
     } catch (error) {}
   }
 
   function Card({ task }) {
     const [isEditing, setEditing] = useState(false);
-
+    const [title, setTitle] = useState(task.title);
+    const [description, setDesc] = useState(task.description);
+    const [completed, setComp] = useState(task.completed);
     if (!isEditing) {
       return (
         <>
@@ -75,11 +81,37 @@ function App() {
     } else {
       return (
         <>
-          <form onSubmit={(event) => edit(event, task.id)}>
+          <form
+            onSubmit={(event) => edit(event, task.id, () => setEditing(false))}
+          >
             <label>Title</label>
-            <input type="text" name="title" />
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={(event) => {
+                setTitle(event.target.value);
+              }}
+            />
             <label>Description</label>
-            <textarea name="description" />
+            <textarea
+              name="description"
+              value={description}
+              onChange={(event) => {
+                setDesc(event.target.value);
+              }}
+            />
+            <label>
+              <input
+                type="checkbox"
+                name="completed"
+                value={completed}
+                onChange={(event) => {
+                  setComp(event.target.checked);
+                }}
+              />
+              {completed ? "Completed" : "Not Completed"}
+            </label>
             <button type="submit">Save</button>
             <button
               type="button"
