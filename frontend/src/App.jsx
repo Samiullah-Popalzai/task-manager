@@ -18,25 +18,29 @@ function App() {
   }, []);
 
   async function handleSubmit(event) {
-    event.preventDefault();
-    try {
-      const formData = new FormData(event.target);
-      const request = await fetch("http://localhost:3000/api/task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formData.get("title"),
-          desc: formData.get("description"),
-        }),
-      });
-    } catch (error) {
-      console.error(error);
-    }
+  event.preventDefault();
+  const form = event.target; // grab it before the await
+  try {
+    const formData = new FormData(form);
+    
+    const request = await fetch("http://localhost:3000/api/task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: formData.get("title"),
+        desc: formData.get("description"),
+      }),
+    });
+    const newTask = await request.json();
+setTask((prev) => [...prev, newTask]);
+console.log("new data from server is: "+newTask);
+    form.reset();
+  } catch (error) {
+    console.error("submit error:", error);
   }
+}
 
-  async function edit(event, id,closeEditing) {
+  async function edit(event, id, closeEditing) {
     event.preventDefault();
     try {
       const formData = new FormData(event.target);
@@ -57,6 +61,20 @@ function App() {
     } catch (error) {}
   }
 
+  async function deleteTask(id){
+    try{
+      const request = await fetch(`http://localhost:3000/api/task/${id}`,{
+        method:"DELETE"
+      });
+
+      const res = await request.json();
+      setTask(tasks.filter((task) => task.id !== id));
+      console.log("Deleted");
+      console.log(res);
+    }catch(error){
+
+    }
+  }
   function Card({ task }) {
     const [isEditing, setEditing] = useState(false);
     const [title, setTitle] = useState(task.title);
