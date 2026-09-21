@@ -27,7 +27,7 @@ app.post("/api/task", async (req, res) => {
       "INSERT INTO tasks(title,description,completed) VALUES($1,$2,false) RETURNING *",
       [title, desc],
     );
-    res.json(result.rows);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error(error);
   }
